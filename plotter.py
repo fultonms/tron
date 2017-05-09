@@ -1,8 +1,7 @@
 import tron
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
-import numpy as np
-from pylab import norm
+import sys
 
 perceptron = tron.Tron(2)
 fig = None
@@ -21,6 +20,9 @@ def onclick(event):
    else:
       return None
 
+   draw()
+
+def draw():
    plt.cla()
    plt.xlim(-2, 2)
    plt.ylim(-2, 2)
@@ -40,12 +42,20 @@ def onclick(event):
 
    plt.draw()
    plt.show()
- 
 
-fig = plt.figure()
 
-line = fig.add_subplot(111)
-cid = fig.canvas.mpl_connect('button_press_event', onclick)
+if __name__ == '__main__':
+    fig = plt.figure()
 
-fig.show()
-input()
+    line = fig.add_subplot(111)
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+
+    fig.show()
+
+    if len(sys.argv) == 2:
+        filename = sys.argv[1]
+        perceptron.readPoints(filename)
+        perceptron.update()
+        draw()
+
+    input()

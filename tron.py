@@ -1,3 +1,4 @@
+import sys
 from random import choice
 import numpy as np
 from numpy import linalg as lin
@@ -41,10 +42,36 @@ class Tron(object):
           tmp.normalize()
           self.w = np.add(self.w, np.multiply(tmp.label, tmp.coords))
 
-   def exists(sample, astar):
-      for point in sample:
-          coord = point.x
-          label = point.y
-          if sign(np.inner(astar, coord)) != label:
-              return point
-      return None  
+   def readPoints(self, filename):
+        dim = 0
+        points = []
+        f = open(filename, 'r')
+
+        for line in f.readlines():
+            line = line.rstrip('\n')
+            chars = line.split(" ")
+
+            if len(chars) == 1:
+                self.dim = int(chars[0])
+            else:
+                coords = []
+                for c in chars[:-1]:
+                    coords.append(float(c))
+                coords.append(1)
+
+                l = int(chars[-1])
+                assert(l == 1 or l == -1)
+
+                p = Point(coords, l)
+                p.normalize()
+                points.append(p)
+
+        self.points = points
+
+if __name__ == '__main__':
+    perceptron = Tron(0)
+    if len(sys.argv) == 2:
+        filename = sys.argv[1]
+        perceptron.readPoints(filename)
+        perceptron.update()
+        print "Weights: ", perceptron.w
