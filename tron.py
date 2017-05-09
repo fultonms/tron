@@ -1,11 +1,15 @@
 from random import choice
 import numpy as np
+from numpy import linalg as lin
 
-def sign(w, x, b):
-   if sum(wi * xi for wi, xi in zip(w, x)) + b > 0:
-      return -1
+def sign(a):
+   if a >= 0:
+     return 1
    else:
-      return 1
+     return -1
+
+def classify(w, p):
+    return sign(np.inner(w, p))
 
 
 class Point(object):
@@ -16,6 +20,9 @@ class Point(object):
       self.dim = len(coords)
       self.label = label
 
+   def normalize(self):
+      self.coords = np.multiply(self.coords, 1/lin.norm(self.coords))
+
    def __str__(self):
       return "Point: " + str(self.coords) + " " + str(self.label)
    
@@ -23,13 +30,21 @@ class Tron(object):
    def __init__(self, dim, points=[]):
       self.dim = dim
       self.points = points
-      self.w = np.zeros(dim)
-      self.b = 0
+      self.w = np.zeros(dim + 1)
 
+   def addPoint(self, point):
+      self.points.append(point)
 
-   def addPointAndUpdate(self, point):
-    if (point.label != sign(self.w, point.coords, self.b)):
-      self.w += point.label * point.coords
-      self.b += point.label
+   def update(self):
+      for p in self.points:
+          tmp = Point(p.coords, p.label)
+          tmp.normalize()
+          self.w = np.add(self.w, np.multiply(tmp.label, tmp.coords))
 
-    self.points.append(point)
+   def exists(sample, astar):
+      for point in sample:
+          coord = point.x
+          label = point.y
+          if sign(np.inner(astar, coord)) != label:
+              return point
+      return None  

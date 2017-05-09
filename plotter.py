@@ -1,5 +1,6 @@
 import tron
 import matplotlib.pyplot as plt
+import matplotlib.lines as lines
 import numpy as np
 from pylab import norm
 
@@ -12,28 +13,33 @@ def onclick(event):
       return None
 
    if event.button == 1:
-      perceptron.addPointAndUpdate(tron.Point([event.xdata, event.ydata], -1))
+      perceptron.addPoint(tron.Point([event.xdata, event.ydata, 1], -1))
+      perceptron.update()
    elif event.button == 3:
-      perceptron.addPointAndUpdate(tron.Point([event.xdata, event.ydata], 1))
+      perceptron.addPoint(tron.Point([event.xdata, event.ydata, 1], 1))
+      perceptron.update()
    else:
       return None
 
    plt.cla()
+   plt.xlim(-2, 2)
+   plt.ylim(-2, 2)
 
-   n = norm(perceptron.w)
-   ww = perceptron.w/n
-   ww1 = [ww[1], -ww[0]]
-   ww2 = [-ww[1], ww[0]]
+   if len(perceptron.points) > 1:
+        if perceptron.w[1] != 1:
+            x = (-(perceptron.w[0]*-1.5) - perceptron.w[2])/perceptron.w[1]
+            y = (-(perceptron.w[0]*1.5) - perceptron.w[2])/perceptron.w[1]
+            ax = plt.gca()
+            ax.add_line(lines.Line2D([-2, 2], [x, y]))
    
-   line.plot([ww1[0], ww2[0]],[ww1[1], ww2[1]])
-   print perceptron.w
    for p in perceptron.points:
       if p.label == -1:
          line.plot(p.coords[0], p.coords[1], "ro")
       elif p.label == 1:
          line.plot(p.coords[0], p.coords[1], "bo")
 
-   fig.canvas.draw()
+   plt.draw()
+   plt.show()
  
 
 fig = plt.figure()
